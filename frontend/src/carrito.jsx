@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CartContext } from './cartProvider.jsx'
+import { PedidoContext } from './pedidoProvider.jsx'
 
 function Product(props) {
     return (
@@ -27,6 +28,7 @@ function Cart(props) {
 
     const [ user, setUser ] = useState(defUser)
     const [cart, setCart] = useContext(CartContext);
+    const [pedido, setPedido] = useContext(PedidoContext);
     const navigate = useNavigate();
 
     const handleChange = (event) => {
@@ -37,11 +39,22 @@ function Cart(props) {
         }));
     };
 
+    const handleSummit = (event) => {
+        event.preventDefault();
+        for (let prod of cart) prod.inCart = false
+        setCart([])
+        setPedido({
+            "nombre" : user.name,
+            "email" : user.email
+        })
+        navigate("/confirmacion")
+    }
+
     return (
         <div className="d-flex flex-column w-100" style={{ minHeight: '100vh', background: '#6f42c1'}}>
             <div className="container rounded bg-white mt-5">
                 <div className="row justify-content-center">
-                    <form className="col-md-4 order-md-1 order-2 order-sm-2 d-flex justify-content-center">
+                    <form className="col-md-4 order-md-1 order-2 order-sm-2 d-flex justify-content-center" onSubmit={handleSummit}>
                             <div className="p-3 py-5">
                                 <h4 className="text-right mb-3">Información de envío</h4>
                                 <div className="row mt-2">
