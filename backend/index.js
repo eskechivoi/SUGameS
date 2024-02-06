@@ -25,7 +25,7 @@ mongoose.connect(url)
 app.use(express.json())
 app.use(cors())
 app.use('/api/buy', buyRouter)
-app.use('/api/comment/', commentRouter)
+app.use('/api/comment', commentRouter)
 
 // Sirve los archivos estáticos de la carpeta dist
 app.use(express.static(path.join(__dirname, '../frontend/dist')));

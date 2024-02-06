@@ -1,26 +1,17 @@
 const commentRouter = require('express').Router()
+const Comment = require('../models/comment')
 
 commentRouter.get('/:game', async (request, response) => {
-    const token = getTokenFrom(request)
-    if (!token) return response.status(401).json({ error: 'token invalid' })
-    
-    const decodedToken = jwt.verify(token, process.env.SECRET)
-    if (!decodedToken.id) {
-        return response.status(401).json({ error: 'token invalid' })
-    }
-
-    const user = await User.findById(decodedToken.id).catch(() => {
-        return response.status(500).json({ error: 'server error'})
+    const { game } = request.body
+    const comments = await Comment.find({"game": game}, { projection: { _id: 0 }}).catch(() => {
+        return response.status(500).json({ error: 'Server error'})
     })
 
-    if (user.num != request.params.num) // Esta comprobación es absurrda, es para el reto.
-        return response.status(401).json({ error: 'token invalid' })
-    
-    delete user.password // No enviamos el hash de la contraseña a través de la red
+    response.status(200).send(comments)
+})
 
-    response
-    .status(200)
-    .send(user)
+commentRouter.post('/:game', async (request, response) => {
+    
 })
 
 module.exports = commentRouter;

@@ -114,16 +114,47 @@ function Comment (props) {
         <div className="card h-100">
                 <img className="card-img-top" src={props.comment.image} alt="..." />
                 <div className="card-body p-4">
-                    <h5 className="fw-bolder">{props.comment.name}</h5>
-                    <p className="text-muted text-decoration-line-through">{props.comment.price}</p>
+                    <h5 className="fw-bolder">{props.comment.game}</h5>
+                    <p className="text-muted text-decoration-line-through">{props.comment.text}</p>
                 </div>
         </div>
     )
 }
 
 function Game (props) {
+    const blankComment = {
+        "game" : props.game.name,
+        "text" : '',
+        "image": ''
+    }
+    const [ comment, setComment ] = useState(blankComment)
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setComment((prevDatos) => ({
+          ...prevDatos,
+          [name]: value,
+        }));
+    };
+
+    const handleSummit = (event) => {
+        event.preventDefault();
+        fetch('/api/comment', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(comment),
+        })
+        .then(async response => {
+            const data = await response.json();
+            setPopup(data)
+            setShowPopUp(true)
+        })
+    }
+
     return (
-        <>
+        <div style={{maxHeight: '65vh', overflow: 'auto'}}>
             <div>
                 <img className="card-img-top" src={props.game.image} alt="..." />
                 <div className="card-body p-4">
@@ -133,13 +164,29 @@ function Game (props) {
                 </div>
             </div>
             <hr></hr>
+            <h4>Publica un comentario sobre el juego</h4>
+            <form onSubmit={handleSummit}>
+                <div className='mt-3'>
+                    <div className="col-md-12">
+                        <label className="labels">Comentario</label>
+                        <textarea type="text" className="form-control" placeholder="Tu comentario..." value={comment.text} onChange={handleChange} name="text"/>
+                    </div>
+                    <div className="col-md-12">
+                        <label className="labels mb-2">Sube una captura del juego <i>(opcional)</i></label>
+                        <input type="file" className="form-control" value={comment.image} onChange={handleChange} name="image"/>
+                    </div>
+                    <div className="mt-3 text-center"><button className="btn btn-primary profile-button" type="submit">Publicar</button></div>
+                </div>
+            </form>
+            <hr/>
+            <h4 className='text-center'>Comentarios</h4>
             {props.comments.map((comment, i) => (
                 <>
                     <Comment key={i} comment={comment}/>
                     <hr/>
                 </>
             ))}
-        </>
+        </div>
     )
 }
 
@@ -179,7 +226,14 @@ function Shop(props) {
 
     const handleProductClick = (event, prod) => {
         event.preventDefault();
-        // setComments(apiSearch(prod))
+        fetch('/api/comment/' + prod.name, {
+            method: 'GET'
+        })
+        .then(async response => {
+            const data = await response.json();
+            if (response.ok) setComments(data)
+            else alert(data.error)
+        })
         setSelProd(prod);
     }
 
