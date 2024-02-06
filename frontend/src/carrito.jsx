@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CartContext } from './cartProvider.jsx'
 import PopUp from './popup.jsx'
@@ -51,20 +51,73 @@ function Cart(props) {
         }));
     };
 
+    const validarDatos = (datos) => {
+        const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const regexPhone = /^[0-9]{9}$/;
+        const regexPostcode = /^[0-9]{5}$/;
+        const regexTarjeta = /^[0-9]{4}[-][0-9]{4}[-][0-9]{4}[-][0-9]{4}$/;
+        const regexCVV = /^[0-9]{3}$/;
+        const regexCaducidad = /^[0-9]{2}[/][0-9]{2}[/][0-9]{4}$/;
+        if (datos.name === '' || datos.surname === '' || datos.address === '' || datos.country === '' || datos.state === '') {
+            alert("Rellena todos los campos.")
+            return false;
+        }
+        if (!regexEmail.test(datos.email)) {
+            alert("El email no tiene el formato correcto.")
+            return false;
+        } 
+        if (!regexPhone.test(datos.phoneNumber)) {
+            alert("El número de teléfono no tiene el formato correcto.")
+            return false;
+        }
+        if (!regexPostcode.test(datos.postcode)) {
+            alert("El código postal no tiene el formato correcto.")
+            return false;
+        }
+        if (!regexTarjeta.test(datos.numTarjeta)) {
+            alert("El número de tarjeta no tiene el formato correcto.")
+            return false;
+        }
+        if (!regexCVV.test(datos.cvv)) {
+            alert("El cvv no tiene el formato correcto.")
+            return false;
+        }
+        if (!regexCaducidad.test(datos.caducidad)) {
+            alert("La fecha de caducidad no tiene el formato correcto.")
+            return false;
+        }
+        return true;
+    }
+
     const handleSummit = (event) => {
         event.preventDefault();
-        setPopup({
-            "header" : "Tu pedido se ha confirmado, " + user.name,
-            "text" : "Te llegará un correo de confirmación a " + user.email + " cuando se envíe el paquete",
-            "button" : "Volver a la tienda"
-        })
-        setShowPopUp(true)
+        if(validarDatos(user)) {
+            fetch('/api/buy', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user),
+            })
+            .then(async response => {
+                const data = await response.json();
+                console.log(data)
+                setPopup(data)
+                setShowPopUp(true)
+            })
+        } 
     }
 
     const handleConfirmPopup = (event) => {
         event.preventDefault();
         navigate("/")
     }
+
+    useEffect(() => {
+        const newTotal = cart.reduce((total, prod) => total + parseFloat(prod.price), 0);
+        user.price = newTotal
+        setUser(user);
+      }, [cart]);
 
     return (
         <div className="d-flex flex-column w-100" style={{ minHeight: '100vh', background: '#6f42c1'}}>
@@ -117,7 +170,7 @@ function Cart(props) {
                                     <Product product={prod}></Product>
                                 )}   
                                 <hr></hr>    
-                                <div className="col-md-12"><b>Total: </b>{cart.reduce((total, prod) => total + parseFloat(prod.price), 0)}€</div>                    
+                                <div className="col-md-12"><b>Total: </b>{user.price}€</div>            
                             </div>
                     </div>
                 </div>
