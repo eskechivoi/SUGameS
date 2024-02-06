@@ -147,9 +147,8 @@ function Game (props) {
             body: JSON.stringify(comment),
         })
         .then(async response => {
-            const data = await response.json();
-            setPopup(data)
-            setShowPopUp(true)
+            if (response.ok) alert("Comentario publicado correctamente.")
+            else alert("No se ha podido publicar el comentario.")
         })
     }
 
