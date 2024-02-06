@@ -101,7 +101,6 @@ function Cart(props) {
             })
             .then(async response => {
                 const data = await response.json();
-                console.log(data)
                 setPopup(data)
                 setShowPopUp(true)
             })
@@ -115,8 +114,7 @@ function Cart(props) {
 
     useEffect(() => {
         const newTotal = cart.reduce((total, prod) => total + parseFloat(prod.price), 0);
-        user.price = newTotal
-        setUser(user);
+        setUser(prevUser => ({...prevUser, price: newTotal}));
       }, [cart]);
 
     return (
