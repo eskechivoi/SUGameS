@@ -2,11 +2,13 @@ require('dotenv').config()
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const loginRouter = require('./controllers/login')
+const buyRouter = require('./controllers/buy')
 const registerRouter = require('./controllers/register')
 const profileRouter = require('./controllers/profile')
-const mongoose = require('mongoose')
 const path = require('path')
+
+/*
+const mongoose = require('mongoose')
 
 mongoose.set('strictQuery', false)
 
@@ -21,12 +23,11 @@ mongoose.connect(url)
 	.catch((error) => {
 	console.log('error connecting to MongoDB:', error.message)
 	})
+*/
 
 app.use(express.json())
 app.use(cors())
-app.use('/api/login', loginRouter)
-app.use('/api/register', registerRouter)
-app.use('/api/profile', profileRouter)
+app.use('/api/buy', buyRouter)
 
 // Sirve los archivos estáticos de la carpeta dist
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
@@ -40,17 +41,12 @@ function redirectFront (req, res) {
 }
 
 // Redirige las rutas del front al index.html
-app.get('/login', function(req, res) {
+app.get('/', function(req, res) {
 	redirectFront(req,res)
 })
 
 // Redirige las rutas del front al index.html
-app.get('/register', function(req, res) {
-	redirectFront(req,res)
-})
-
-// Redirige las rutas del front al index.html
-app.get('/profile', function(req, res) {
+app.get('/cart', function(req, res) {
 	redirectFront(req,res)
 })
 
