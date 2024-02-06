@@ -139,7 +139,7 @@ function Game (props) {
 
     const handleSummit = (event) => {
         event.preventDefault();
-        fetch('/api/comment', {
+        fetch('/api/comment/' + props.game.name, {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
