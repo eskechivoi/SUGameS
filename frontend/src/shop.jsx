@@ -1,6 +1,7 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CartContext } from './cartProvider.jsx'
+import PopUp from './popup.jsx';
 import React from 'react';
 import NavbarSugus from './navbar.jsx';
 import totkImg from './img/zeldatotk.png'
@@ -17,8 +18,8 @@ const prods = [
         "numStars" : 4
     },{
         "name" : "Zelda Tears of the Kingdom",
-        "price" : "60€",
-        "discount" : "40€",
+        "price" : "40€",
+        "previous" : "60€",
         "image" : totkImg,
         "numStars" : 5
     },{
@@ -31,8 +32,8 @@ const prods = [
 
 function Sale(props) {
     return (
-        <div className="col mb-5">
-            <div className="card h-100">
+        <div className="col mb-5" onClick={props.onClick}>
+            <div className="card h-100" style={{cursor: 'pointer'}}>
                 {/* Sale badge */}
                 <div className="badge bg-dark text-white position-absolute" style={{top: '0.5rem', right: '0.5rem'}}>Sale</div>
                 {/* Product image */}
@@ -47,7 +48,7 @@ function Sale(props) {
                             {Array(props.product.numStars).fill().map((_, i) => <div key={i} className="bi-star-fill"></div>)}
                         </div>
                         {/* Product price */}
-                        <span className="text-muted text-decoration-line-through">{props.product.price}</span> {props.product.discount}
+                        <span className="text-muted text-decoration-line-through">{props.product.previous}</span> {props.product.price}
                     </div>
                 </div>
                 {/* Product actions */}
@@ -55,7 +56,10 @@ function Sale(props) {
                     <div className="text-center">
                         <button 
                             className="btn btn-outline-dark mt-auto" 
-                            onClick={() => props.onAddToCart(props.product)}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                props.onAddToCart(props.product);
+                            }}
                         >
                             {props.product.inCart ? 'Quitar del carrito' : 'Añadir al carrito'}
                         </button>
@@ -69,8 +73,8 @@ function Sale(props) {
 
 function Product(props) {
     return (
-        <div className="col mb-5">
-            <div className="card h-100">
+        <div className="col mb-5" onClick={props.onClick}>
+            <div className="card h-100" style={{cursor: 'pointer'}}>
                 {/* Product image */}
                 <img className="card-img-top" src={props.product.image} alt="..." />
                 {/* Product details */} 
@@ -91,7 +95,10 @@ function Product(props) {
                     <div className="text-center">
                         <button 
                             className="btn btn-outline-dark mt-auto" 
-                            onClick={() => props.onAddToCart(props.product)}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                props.onAddToCart(props.product);
+                            }}
                         >
                             {props.product.inCart ? 'Quitar del carrito' : 'Añadir al carrito'}
                         </button>
@@ -102,10 +109,52 @@ function Product(props) {
     )
 }
 
+function Comment (props) {
+    return (
+        <div className="card h-100">
+                <img className="card-img-top" src={props.comment.image} alt="..." />
+                <div className="card-body p-4">
+                    <h5 className="fw-bolder">{props.comment.name}</h5>
+                    <p className="text-muted text-decoration-line-through">{props.comment.price}</p>
+                </div>
+        </div>
+    )
+}
+
+function Game (props) {
+    return (
+        <>
+            <div>
+                <img className="card-img-top" src={props.game.image} alt="..." />
+                <div className="card-body p-4">
+                    <div className="text-center">
+                        <h5 className="fw-bolder">{props.game.name}</h5>            
+                    </div>
+                </div>
+            </div>
+            <hr></hr>
+            {props.comments.map((comment, i) => (
+                <>
+                    <Comment key={i} comment={comment}/>
+                    <hr/>
+                </>
+            ))}
+        </>
+    )
+}
+
 function Shop(props) {
     const [ numItems, setNumItems ] = useState(0)
     const [ cart, setCart ] = useContext(CartContext);
+    const [ selProd, setSelProd ] = useState(null)
+    const [ comments, setComments ] = useState([])
     const navigate = useNavigate();
+
+    // Vacía el carrito al recargar la tienda (para el reto es suficiente)
+    useEffect(() => {
+        for (let prod of cart) prod.inCart = false
+        setCart([])
+    }, []);
 
     const handleAddToCart = (product) => {
         console.log(product);
@@ -126,6 +175,14 @@ function Shop(props) {
         navigate('/cart')
     }
 
+    const handleClosePopup = (_) => setSelProd(null)
+
+    const handleProductClick = (event, prod) => {
+        event.preventDefault();
+        // setComments(apiSearch(prod))
+        setSelProd(prod);
+    }
+
     return(
         <>
             <NavbarSugus numItems={numItems} onHandleClick={handleClickOnCart}/>
@@ -142,10 +199,10 @@ function Shop(props) {
                     <div className="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
                         {/* AQUÍ VAN LOS PRODUCTOS */}
                         {prods.map((prod, index) => 
-                            prod.discount ? 
-                            <Sale key={index} product={prod} onAddToCart={handleAddToCart}/> 
+                            prod.previous ? 
+                            <Sale key={index} product={prod} onAddToCart={handleAddToCart} onClick={(event) => handleProductClick(event, prod)}/> 
                             : 
-                            <Product key={index} product={prod} onAddToCart={handleAddToCart}/>
+                            <Product key={index} product={prod} onAddToCart={handleAddToCart} onClick={(event) => handleProductClick(event, prod)}/>
                         )}
                     </div>
                 </div>
@@ -153,6 +210,7 @@ function Shop(props) {
             <footer className="py-5 bg-dark">
                 <div className="container"><p className="m-0 text-center text-white">Copyright &copy; SUGUS 2024</p></div>
             </footer>
+            {selProd !== null && <PopUp component={<Game game={selProd} comments={comments}/>} button={"Cerrar"} onHandleClose={handleClosePopup}/>}
         </>
     )
 }

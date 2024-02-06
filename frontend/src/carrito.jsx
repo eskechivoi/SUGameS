@@ -1,7 +1,17 @@
 import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CartContext } from './cartProvider.jsx'
-import { PedidoContext } from './pedidoProvider.jsx'
+import PopUp from './popup.jsx'
+
+function Confirm(props) {
+    return (
+        <>
+            <h2>{props.popup.header}</h2>
+            <p>{props.popup.text}</p>
+        </>
+    )
+    
+}
 
 function Product(props) {
     return (
@@ -26,9 +36,11 @@ function Cart(props) {
         "caducidad" : ''
     }
 
-    const [ user, setUser ] = useState(defUser)
+    const [ user, setUser ] = useState(defUser);
+    const [ showPopUp, setShowPopUp ] = useState(false);
+    const [ popUp, setPopup ] = useState(null)
     const [cart, setCart] = useContext(CartContext);
-    const [pedido, setPedido] = useContext(PedidoContext);
+
     const navigate = useNavigate();
 
     const handleChange = (event) => {
@@ -41,17 +53,22 @@ function Cart(props) {
 
     const handleSummit = (event) => {
         event.preventDefault();
-        for (let prod of cart) prod.inCart = false
-        setCart([])
-        setPedido({
-            "nombre" : user.name,
-            "email" : user.email
+        setPopup({
+            "header" : "Tu pedido se ha confirmado, " + user.name,
+            "text" : "Te llegará un correo de confirmación a " + user.email + " cuando se envíe el paquete",
+            "button" : "Volver a la tienda"
         })
-        navigate("/confirmacion")
+        setShowPopUp(true)
+    }
+
+    const handleConfirmPopup = (event) => {
+        event.preventDefault();
+        navigate("/")
     }
 
     return (
         <div className="d-flex flex-column w-100" style={{ minHeight: '100vh', background: '#6f42c1'}}>
+            {showPopUp && <PopUp component={<Confirm popup={popUp}/>} button={popUp.button} onHandleClose={handleConfirmPopup}/>}
             <div className="container rounded bg-white mt-5">
                 <div className="row justify-content-center">
                     <form className="col-md-4 order-md-1 order-2 order-sm-2 d-flex justify-content-center" onSubmit={handleSummit}>

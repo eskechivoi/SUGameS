@@ -10,11 +10,11 @@ function NavbarSugus(props) {
                 <Nav className="me-auto">
                     <Nav.Link href="#!">Home</Nav.Link>
                     <Nav.Link href="#!">About</Nav.Link>
-                    <NavDropdown title="Shop" id="basic-nav-dropdown">
-                        <NavDropdown.Item href="#!">All Products</NavDropdown.Item>
+                    <NavDropdown title="Tienda" id="basic-nav-dropdown">
+                        <NavDropdown.Item href="#!">Todos los juegos</NavDropdown.Item>
                         <NavDropdown.Divider />
-                        <NavDropdown.Item href="#!">Popular Items</NavDropdown.Item>
-                        <NavDropdown.Item href="#!">New Arrivals</NavDropdown.Item>
+                        <NavDropdown.Item href="#!">Populares</NavDropdown.Item>
+                        <NavDropdown.Item href="#!">Nuevos lanzamientos</NavDropdown.Item>
                     </NavDropdown>
                 </Nav>
                 <Form>
