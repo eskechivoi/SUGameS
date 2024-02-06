@@ -115,7 +115,7 @@ function Comment (props) {
                 <img className="card-img-top" src={props.comment.image} alt="..." />
                 <div className="card-body p-4">
                     <h5 className="fw-bolder">{props.comment.game}</h5>
-                    <p className="text-muted text-decoration-line-through">{props.comment.text}</p>
+                    <p>{props.comment.text}</p>
                 </div>
         </div>
     )
