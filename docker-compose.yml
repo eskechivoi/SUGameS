@@ -1,0 +1,11 @@
+version: '3'
+services:
+  SUGameS:
+    image: node:latest
+    volumes:
+      - ./backend:/usr/src/app/backend
+      - ./frontend:/usr/src/app/frontend
+    working_dir: /usr/src/app/backend
+    command: npm start
+    ports: 
+    - 80:80
