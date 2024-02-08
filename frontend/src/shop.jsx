@@ -112,7 +112,7 @@ function Product(props) {
 function Comment (props) {
     return (
         <div className="card h-100">
-                <img className="card-img-top" src={props.comment.image} alt="..." />
+                <img className="card-img-top" src={`/uploads/${props.comment.image}`} alt="..." />
                 <div className="card-body p-4">
                     <h5 className="fw-bolder">{props.comment.game}</h5>
                     <p>{props.comment.text}</p>

@@ -38,6 +38,10 @@ function redirectFront (req, res) {
 	  })
 }
 
+// Sirve los archivos estáticos desde la carpeta 'uploads'
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
 // Redirige las rutas del front al index.html
 app.get('/', function(req, res) {
 	redirectFront(req,res)

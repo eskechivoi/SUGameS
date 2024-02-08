@@ -28,7 +28,8 @@ commentRouter.get('/:game', async (request, response) => {
 
 commentRouter.post('/:game', upload.single('image'), async (request, response) => {
     const comment = request.body;
-    console.log(comment)
+    const filename = request.file.originalname;
+    comment.image = filename;
 
     const commentBD = new Comment(comment)
 
