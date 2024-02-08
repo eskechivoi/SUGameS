@@ -125,12 +125,13 @@ function Game (props) {
     const blankComment = {
         "game" : props.game.name,
         "text" : '',
-        "image": ''
+        "image": null
     }
     const [ comment, setComment ] = useState(blankComment)
 
     const handleChange = (event) => {
-        const { name, value } = event.target;
+        const { name } = event.target;
+        const value = name === 'image' ? event.target.files[0] : event.target.value;
         setComment((prevDatos) => ({
           ...prevDatos,
           [name]: value,
@@ -139,12 +140,14 @@ function Game (props) {
 
     const handleSummit = (event) => {
         event.preventDefault();
+        const formData = new FormData()
+        formData.append('game', props.game.name)
+        formData.append('text', comment.text)
+        if (comment.image)
+            formData.append('image', comment.image, comment.image.name);
         fetch('/api/comment/' + props.game.name, {
             method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(comment),
+            body: formData,
         })
         .then(async response => {
             if (response.ok) alert("Comentario publicado correctamente.")
@@ -172,7 +175,7 @@ function Game (props) {
                     </div>
                     <div className="col-md-12">
                         <label className="labels mb-2">Sube una captura del juego <i>(opcional)</i></label>
-                        <input type="file" className="form-control" value={comment.image} onChange={handleChange} name="image"/>
+                        <input type="file" className="form-control" onChange={handleChange} name="image"/>
                     </div>
                     <div className="mt-3 text-center"><button className="btn btn-primary profile-button" type="submit">Publicar</button></div>
                 </div>
