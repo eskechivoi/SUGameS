@@ -151,8 +151,17 @@ function Game (props) {
         })
         .then(async response => {
             if (response.ok) alert("Comentario publicado correctamente.")
-            else alert("No se ha podido publicar el comentario.")
+            else {
+                const status = response.status;
+                if (status === 403)
+                    alert(`Solo se permiten archivos de imagen (jpeg o png)`);
+                else 
+                    alert(`No se ha podido publicar el comentario.`)
+            }
         })
+        .catch(error => {
+            alert(`Ha ocurrido un error: ${error.message}`);
+        });
     }
 
     return (

@@ -5,7 +5,6 @@ const multer = require('multer')
 const Comment = require('../models/comment')
 
 // MAL / VULNERABLE - Nunca poner el nombre del archivo original en la ruta.
-// MAL / VULNERABLE - No comprobamos que el nombre del archivo sea de un determinado tipo.
 const storage = multer.diskStorage({
     destination: function (_, _, cb) {
         cb(null, 'uploads/')
@@ -15,7 +14,21 @@ const storage = multer.diskStorage({
     }
 })
 
-const upload = multer({ storage: storage });
+// Esto es una medida de seguridad para prevenir que no se suban archivos de determiando tipo, 
+// pero no es completa, debido a que se puede cambiar la extensión del archivo.
+const upload = multer({ 
+    storage: storage,
+    fileFilter: function (_, file, cb) {
+        // Comprueba si el archivo es una imagen
+        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+            // Acepta el archivo
+            cb(null, true);
+        } else {
+            // Rechaza el archivo
+            cb(new multer.MulterError('Solo se permiten archivos de imagen (jpeg o png)'), false);
+        }
+    }
+});
 
 
 commentRouter.get('/:game', async (request, response) => {
@@ -40,8 +53,14 @@ commentRouter.post('/:game', upload.single('image'), async (request, response) =
         if (error.code === 11000) 
             return response.status(401).send();
         else 
-            return response.status(500).send();
+            return next(error); // Pasamos el error al middleware de error
     })
-})
+}, (error, req, response, next) => { // Middleware de error personalizado
+    if (error instanceof multer.MulterError) {
+        return response.status(403).send({message: `Error al guardar archivos. Solo se permiten archivos de imagen (jpeg o png) `});
+    } else if (error) {
+        return response.status(500).send({message: `Error del servidor`});
+    }
+});
 
 module.exports = commentRouter;
