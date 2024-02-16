@@ -14,8 +14,7 @@ const storage = multer.diskStorage({
     }
 })
 
-// Esto es una medida de seguridad para prevenir que no se suban archivos de determiando tipo, 
-// pero no es completa, debido a que se puede cambiar la extensión del archivo.
+// VULNERABLE : mimetype solo comprueba el tipo definido en las cabeceras del archivo, no comprueba el tipo real
 const upload = multer({ 
     storage: storage,
     fileFilter: function (_, file, cb) {

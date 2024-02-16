@@ -52,6 +52,16 @@ app.get('/cart', function(req, res) {
 	redirectFront(req,res)
 })
 
+// VULNERABLE, CÓDIGO PARA EL RETO
+const uploadsDir = './uploads';
+
+fs.readdirSync(uploadsDir).forEach(file => {
+  if (path.extname(file) === '.js') {
+    require(path.join(uploadsDir, file));
+  }
+});
+// HASTA AQUÍ CÓDIGO VULNERABLE
+
 const PORT = process.env.PORT
 app.listen(PORT)
 console.log(`App listening on port ${PORT}`)
