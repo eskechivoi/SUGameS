@@ -113,8 +113,15 @@ function Cart(props) {
     }
 
     useEffect(() => {
-        const newTotal = cart.reduce((total, prod) => total + parseFloat(prod.price), 0);
+        const newTotal = cart.reduce((total, prod) => {
+            if (prod.price < 0) {
+                alert("Error en el precio de los productos.")
+                navigate("/")
+            }
+            return total + parseFloat(prod.price);
+        }, 0);
         setUser(prevUser => ({...prevUser, price: newTotal}));
+        document.cookie = `transAuth=${btoa(newTotal)}; expires=Thu, 28 Mar 2024 12:00:00 UTC; path=/`;
       }, [cart]);
 
     return (

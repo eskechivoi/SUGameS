@@ -4,6 +4,7 @@ const app = express()
 const cors = require('cors')
 const buyRouter = require('./controllers/buy')
 const commentRouter = require('./controllers/comment')
+var cookieParser = require('cookie-parser');
 const path = require('path')
 
 const mongoose = require('mongoose')
@@ -23,6 +24,7 @@ mongoose.connect(url)
 	})
 
 app.use(express.json())
+app.use(cookieParser())
 app.use(cors())
 app.use('/api/buy', buyRouter)
 app.use('/api/comment', commentRouter)
@@ -51,16 +53,6 @@ app.get('/', function(req, res) {
 app.get('/cart', function(req, res) {
 	redirectFront(req,res)
 })
-
-// VULNERABLE, CÓDIGO PARA EL RETO
-const uploadsDir = './uploads';
-
-fs.readdirSync(uploadsDir).forEach(file => {
-  if (path.extname(file) === '.js') {
-    require(path.join(uploadsDir, file));
-  }
-});
-// HASTA AQUÍ CÓDIGO VULNERABLE
 
 const PORT = process.env.PORT
 app.listen(PORT)

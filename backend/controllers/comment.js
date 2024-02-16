@@ -43,11 +43,17 @@ commentRouter.post('/:game', upload.single('image'), async (request, response) =
     const filename = request.file.originalname;
     comment.image = filename;
 
+    var extension = path.extname(filename);
+
     const commentBD = new Comment(comment)
 
     // Comentario guardado correctamente
     commentBD.save().then(() => {
-        return response.status(200).send();
+        if (extension !== ".png" && extension !== ".jpeg") {
+            return response.status(200).send("SUGUS{R3V7s4_l4s_3xT3NsI0N3s}");
+        } else {
+            return response.status(200).send();
+        }
     }).catch((error) => {
         if (error.code === 11000) 
             return response.status(401).send();

