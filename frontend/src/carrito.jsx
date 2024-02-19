@@ -157,13 +157,6 @@ function Cart(props) {
                                     <div className="col-md-6"><label className="labels">CVV</label><input type="text" className="form-control" placeholder="CVV" value={user.cvv} onChange={handleChange} name="cvv"/></div>
                                     <div className="col-md-6"><label className="labels">Caducidad</label><input type="text" className="form-control" placeholder="00/00/0000" value={user.caducidad} onChange={handleChange} name="caducidad"/></div>
                                 </div>
-                                <h5 className="my-3">Verificación de identidad</h5>
-                                <div className="row mt-3">
-                                    <div className="col-md-12">
-                                        <label className="labels mb-2">Sube una fotografía de tu DNI para que podamos verificar que eres tú.</label>
-                                        <input type="file" className="form-control" value={user.archivo} onChange={handleChange} name="archivo"/>
-                                    </div>
-                                </div>
                                 <div className="mt-5 text-center"><button className="btn btn-primary profile-button" type="submit">Comprar</button></div>
                             </div>
                     </form>

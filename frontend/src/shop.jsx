@@ -7,6 +7,9 @@ import NavbarSugus from './navbar.jsx';
 import totkImg from './img/zeldatotk.png'
 import octopathImg from './img/octopath.png'
 import eldenImg from './img/eldenring.png'
+import stfldImg from './img/starfield.png'
+import alanImg from './img/alanwake.png'
+import bg3Img from './img/baldurs.png'
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
@@ -26,6 +29,22 @@ const prods = [
         "name" : "Elden Ring",
         "price" : "60€",
         "image" : eldenImg,
+        "numStars" : 5
+    },{
+        "name" : "Starfield",
+        "price" : "50€",
+        "image" : stfldImg,
+        "numStars" : 4
+    },{
+        "name" : "Alan Wake 2",
+        "price" : "40€",
+        "image" : alanImg,
+        "numStars" : 5
+    },{
+        "name" : "Baldurs Gate 3",
+        "price" : "30€",
+        "previous" : "60€",
+        "image" : bg3Img,
         "numStars" : 5
     }
 ]
