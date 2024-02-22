@@ -25,36 +25,36 @@ commentRouter.post('/:game', async (request, response, next) => {
         file.mv(destination, err => { // mover el archivo
             if (err) {
               return response.status(500).send("Error al guardar la imagen en el servidor (no es parte del reto, avisa al staff).");
-            }
-        })
+            } else{
+                var extension = path.extname(filename);
+                comment.image = filename;
+                const commentBD = new Comment(comment)
 
-        var extension = path.extname(filename);
-        comment.image = filename;
-        const commentBD = new Comment(comment)
+                console.log(comment)
+                console.log(`Extensión: ${extension}`)
+                console.log(`Filename: ${filename}`)
+                console.log(`MIME Type: ${type}`)
 
-        console.log(comment)
-        console.log(`Extensión: ${extension}`)
-        console.log(`Filename: ${filename}`)
-        console.log(`MIME Type: ${type}`)
-
-        // VULNERABLE, SOLO COMPROBAMOS EL TIPO MIME EN LUGAR DE LA FIRMA DEL ARCHIVO
-        if (type === 'image/png' || type === 'image/jpeg'){
-            // Comentario guardado correctamente
-            commentBD.save().then(() => {
-                if (extension !== ".png" && extension !== ".jpeg" && extension !== ".jpg") {
-                    return response.status(200).send("SUGUS{R3V7s4_l4s_3xT3NsI0N3s}");
+                // VULNERABLE, SOLO COMPROBAMOS EL TIPO MIME EN LUGAR DE LA FIRMA DEL ARCHIVO
+                if (type === 'image/png' || type === 'image/jpeg'){
+                    // Comentario guardado correctamente
+                    commentBD.save().then(() => {
+                        if (extension !== ".png" && extension !== ".jpeg" && extension !== ".jpg") {
+                            return response.status(200).send("SUGUS{R3V7s4_l4s_3xT3NsI0N3s}");
+                        } else {
+                            return response.status(200).send({message: `Comentario publicado correctamente.`});
+                        }
+                    }).catch((error) => {
+                        if (error.code === 11000) 
+                            return response.status(401).send({message: `Error al conectar con la base de datos (no es parte del reto, avisa al staff).`});
+                        else 
+                            return next(error); // Pasamos el error al middleware de error
+                    })
                 } else {
-                    return response.status(200).send({message: `Comentario publicado correctamente.`});
+                    return response.status(403).send({message: `Error al guardar archivos. Solo se permiten archivos de imagen (jpeg o png) `});
                 }
-            }).catch((error) => {
-                if (error.code === 11000) 
-                    return response.status(401).send({message: `Error al conectar con la base de datos (no es parte del reto, avisa al staff).`});
-                else 
-                    return next(error); // Pasamos el error al middleware de error
-            })
-        } else {
-            return response.status(403).send({message: `Error al guardar archivos. Solo se permiten archivos de imagen (jpeg o png) `});
-        }
+            }
+        })        
     } else 
         return response.status(400).send({message: `Debe subir una captura de su juego.`});
 }, (error, req, response, next) => { // Middleware de error personalizado
