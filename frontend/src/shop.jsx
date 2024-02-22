@@ -131,7 +131,7 @@ function Product(props) {
 function Comment (props) {
     return (
         <div className="card h-100">
-                <img className="card-img-top" src={`/uploads/${props.comment.image}`} alt="..." />
+                <img className="card-img-top" src={`/uploads/${props.comment.image}`} alt="..." style={{width: 533, height: 300}}/>
                 <div className="card-body p-4">
                     <h5 className="fw-bolder">{props.comment.game}</h5>
                     <p>{props.comment.text}</p>
@@ -147,6 +147,7 @@ function Game (props) {
         "image": null
     }
     const [ comment, setComment ] = useState(blankComment)
+    const navigate = useNavigate();
 
     const handleChange = (event) => {
         const { name } = event.target;
@@ -169,11 +170,17 @@ function Game (props) {
             body: formData,
         })
         .then(async response => {
-            if (response.ok) alert("Comentario publicado correctamente.")
+            const data = await response.json()
+            if (response.ok) {
+                alert("Comentario publicado correctamente.")
+                window.location.reload()
+            }
             else {
                 const status = response.status;
                 if (status === 403)
                     alert(`Solo se permiten archivos de imagen (jpeg o png)`);
+                else if (status === 400)
+                    alert(`${data.message}`)
                 else 
                     alert(`No se ha podido publicar el comentario.`)
             }

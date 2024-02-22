@@ -1,34 +1,6 @@
 const commentRouter = require('express').Router()
-const fs = require('fs')
 const path = require('path')
-const multer = require('multer')
 const Comment = require('../models/comment')
-
-// MAL / VULNERABLE - Nunca poner el nombre del archivo original en la ruta.
-const storage = multer.diskStorage({
-    destination: function (_, _, cb) {
-        cb(null, 'uploads/')
-    },
-    filename: function (_, file, cb) {
-        cb(null, file.originalname)
-    }
-})
-
-// VULNERABLE : mimetype solo comprueba el tipo definido en las cabeceras del archivo, no comprueba el tipo real
-const upload = multer({ 
-    storage: storage,
-    fileFilter: function (_, file, cb) {
-        // Comprueba si el archivo es una imagen
-        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-            // Acepta el archivo
-            cb(null, true);
-        } else {
-            // Rechaza el archivo
-            cb(new multer.MulterError('Solo se permiten archivos de imagen (jpeg o png)'), false);
-        }
-    }
-});
-
 
 commentRouter.get('/:game', async (request, response) => {
     const game = request.params.game;
@@ -38,32 +10,55 @@ commentRouter.get('/:game', async (request, response) => {
     response.status(200).send(comments)
 })
 
-commentRouter.post('/:game', upload.single('image'), async (request, response) => {
+commentRouter.post('/:game', async (request, response) => {
+    if (request.body.text === '') {
+        return response.status(400).send({message: `No se admiten comentarios vacíos`});
+    }
+
     const comment = request.body;
-    const filename = request.file.originalname;
-    comment.image = filename;
+    if (request.files.image){
+        const file = request.files.image; 
+        const filename = file.name;
+        const type = file.mimetype; // EL TIPO MIME DEL ARCHIVO
+        const destination = 'uploads/' + filename
 
-    var extension = path.extname(filename);
+        file.mv(destination, err => { // mover el archivo
+            if (err) {
+              return res.status(500).send("Error al guardar la imagen en el servidor (no es parte del reto, avisa al staff).");
+            }
+        })
 
-    const commentBD = new Comment(comment)
+        var extension = path.extname(filename);
+        comment.image = filename;
+        const commentBD = new Comment(comment)
 
-    // Comentario guardado correctamente
-    commentBD.save().then(() => {
-        if (extension !== ".png" && extension !== ".jpeg") {
-            return response.status(200).send("SUGUS{R3V7s4_l4s_3xT3NsI0N3s}");
+        console.log(comment)
+        console.log(`Extensión: ${extension}`)
+        console.log(`Filename: ${filename}`)
+        console.log(`MIME Type: ${type}`)
+
+        // VULNERABLE, SOLO COMPROBAMOS EL TIPO MIME EN LUGAR DE LA FIRMA DEL ARCHIVO
+        if (type === 'image/png' || type === 'image/jpeg'){
+            // Comentario guardado correctamente
+            commentBD.save().then(() => {
+                if (extension !== ".png" && extension !== ".jpeg" && extension !== ".jpg") {
+                    return response.status(200).send("SUGUS{R3V7s4_l4s_3xT3NsI0N3s}");
+                } else {
+                    return response.status(200).send({message: `Comentario publicado correctamente.`});
+                }
+            }).catch((error) => {
+                if (error.code === 11000) 
+                    return response.status(401).send({message: `Error al conectar con la base de datos (no es parte del reto, avisa al staff).`});
+                else 
+                    return next(error); // Pasamos el error al middleware de error
+            })
         } else {
-            return response.status(200).send();
+            return response.status(403).send({message: `Error al guardar archivos. Solo se permiten archivos de imagen (jpeg o png) `});
         }
-    }).catch((error) => {
-        if (error.code === 11000) 
-            return response.status(401).send();
-        else 
-            return next(error); // Pasamos el error al middleware de error
-    })
+    } else 
+        return response.status(400).send({message: `Debe subir una captura de su juego.`});
 }, (error, req, response, next) => { // Middleware de error personalizado
-    if (error instanceof multer.MulterError) {
-        return response.status(403).send({message: `Error al guardar archivos. Solo se permiten archivos de imagen (jpeg o png) `});
-    } else if (error) {
+    if (error) {
         return response.status(500).send({message: `Error del servidor`});
     }
 });

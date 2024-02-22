@@ -9,7 +9,7 @@ buyRouter.post('/', async (request, response) => {
     if (!encCookie) {
         return response.status(400).json({ 
             message: "No se pudo autenticar la compra.", 
-            header: "400 - Bad Request", 
+            header: "401 - No autorizado", 
             button : "Volver a la tienda"})
     }
     let decCookie = Buffer.from(encCookie, 'base64').toString('utf-8');
@@ -30,7 +30,7 @@ buyRouter.post('/', async (request, response) => {
             })
         }
     } else if (Number(price) !== Number(decCookie)) {
-        response.status(400).json({ message: "No se pudo autenticar la compra.", header: "400 - Bad Request", button : "Volver a la tienda"})
+        response.status(401).json({ message: "No se pudo autenticar la compra.", header: "401 - No autorizado", button : "Volver a la tienda"})
     }
 })
 

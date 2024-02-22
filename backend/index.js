@@ -4,6 +4,7 @@ const app = express()
 const cors = require('cors')
 const buyRouter = require('./controllers/buy')
 const commentRouter = require('./controllers/comment')
+const fileUpload = require('express-fileupload')
 var cookieParser = require('cookie-parser');
 const path = require('path')
 
@@ -26,6 +27,7 @@ mongoose.connect(url)
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors())
+app.use(fileUpload())
 app.use('/api/buy', buyRouter)
 app.use('/api/comment', commentRouter)
 
