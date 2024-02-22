@@ -51,7 +51,7 @@ commentRouter.post('/:game', async (request, response) => {
                     return response.status(401).send({message: `Error al conectar con la base de datos (no es parte del reto, avisa al staff).`});
                 else 
                     return next(error); // Pasamos el error al middleware de error
-            })
+            }, next)
         } else {
             return response.status(403).send({message: `Error al guardar archivos. Solo se permiten archivos de imagen (jpeg o png) `});
         }
