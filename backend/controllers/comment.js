@@ -24,7 +24,7 @@ commentRouter.post('/:game', async (request, response) => {
 
         file.mv(destination, err => { // mover el archivo
             if (err) {
-              return res.status(500).send("Error al guardar la imagen en el servidor (no es parte del reto, avisa al staff).");
+              return response.status(500).send("Error al guardar la imagen en el servidor (no es parte del reto, avisa al staff).");
             }
         })
 
