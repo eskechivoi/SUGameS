@@ -1,5 +1,5 @@
 # SUGameS
-This is a vulnerable web app for the SUGUS CTF 2024. You should not copy-paste this app, because it has serious easy-to-exploit vulnerabilities.
+This is a vulnerable web app for the SUGUS CTF 2024. You should not copy-paste this app, because it has serious easy-to-exploit vulnerabilities. There are two flags in this website, that's why there are two different writeups for two different challenges.
 
 ## Run in a container
 If you want to run this vulnerable web app, first, you have to create the docker image. 
